@@ -1,6 +1,7 @@
 # README #
 
 To get your application up and running you need the following packages:
+
 * Django 1.10.5
 * MysqlClient 1.3.10 (install it using pip)
 
