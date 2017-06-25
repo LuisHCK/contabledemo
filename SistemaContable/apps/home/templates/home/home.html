@@ -1,0 +1,39 @@
+{% load staticfiles %}
+
+<script src="{% static 'js/vue.js' %}"></script>
+<script src="{% static 'js/axios.js' %}"></script>
+
+<div id="app">
+    <ul v-for="account in accounts">
+        <li> 
+            <% account.AccountID %> <% account.AccountName %>
+        </li>
+            <ul v-for="subaccount in account.SubAccounts">
+                <li>
+                   <% account.AccountID %>.<% subaccount.SubAccountID %>
+                   <% subaccount.SubAccountName %>
+                    <ul v-for="sub_subaccount in subaccount.SubSubAccounts">
+                        <li>
+                            <% account.AccountID %>.<% subaccount.SubAccountID %>.<% sub_subaccount.SubSubAccountID %>
+                            <% sub_subaccount.SubSubAccountName %>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+    </ul>
+</div>
+
+<script>
+    var app = new Vue({
+        delimiters: ['<%', '%>'],
+        el: '#app',
+        data: {
+            accounts:[]
+        },
+        mounted() {
+            axios.get("/accounts").then(
+                response => {this.accounts = response.data; console.log(this.accounts)}
+            )
+        }
+    })
+</script>
