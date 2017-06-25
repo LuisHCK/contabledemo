@@ -86,8 +86,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sistemacontable',
-        'USER': 'devherrera',
-        'PASSWORD': '980298',
+        'USER': 'contador',
+        'PASSWORD': 'sistema',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
