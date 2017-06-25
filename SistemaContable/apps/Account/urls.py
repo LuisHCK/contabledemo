@@ -3,4 +3,5 @@ from . import views
 
 app_name = 'account'
 urlpatterns = [
-    url(r'^$', views.ListAccounts, name='ListAccounts'), ]
+    url(r'^$', views.getAccountsStructure, name='getAccountsStructure'),
+    url(r'account', views.listAccounts, name='listAccounts'), ]

@@ -6,6 +6,9 @@ from django.db import models
 class AccountCategory(models.Model):
     name = models.CharField(max_length=15)
 
+    def __str__(self):
+        return self.name
+
 
 class Account(models.Model):
     name = models.CharField(max_length=150)
