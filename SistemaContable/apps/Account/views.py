@@ -1,7 +1,7 @@
 from rest_framework.parsers import JSONParser
 from rest_framework import viewsets
 from .models import Account, SubAccount, SubSubAccount
-from .serializers import AccountSerializer
+from .serializers import AccountSerializer, SubAccountSerializer
 from django.http import JsonResponse, HttpResponse
 from rest_framework.response import Response
 from rest_framework import status
@@ -57,9 +57,63 @@ def rudAccount(request, pk):
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors, status=400)
 
+    # Deletes
     elif request.method == 'DELETE':
         account.delete()
         return HttpResponse(status=204)
+
+
+# Sub Account model CRUD
+
+
+def newSubAccount(request):
+    # This view creates a new SubAccount
+    if request.method == 'POST':
+        serializer = SubAccountSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.data, status=status.HTTP_400_BAD_REQUEST)    
+
+
+@csrf_exempt
+def listSubAccounts(request):
+    # This view lists the Account model existing objetcs.
+    if request.method == 'GET':
+        subAccounts = SubAccount.objects.all()
+        serializer = SubAccountSerializer(subAccounts, many=True)
+        return JsonResponse(
+            serializer.data, safe=False,
+            json_dumps_params={'indent': 2})
+
+
+def rudSubAccount(request, pk):
+    # This view reads, updates or deletes a SubAccount
+    try:
+        subaccount = SubAccount.objects.get(pk=pk)
+    except SubAccount.DoesNotExist:
+        return HttpResponse(status=404)
+    
+    # Reads
+    if request.method == 'GET':
+        serializer = SubAccountSerializer(subaccount, many=False)
+        return JsonResponse(
+            serializer.data, safe=False,
+            json_dumps_params={'indent': 2})
+    # Updates
+    if request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = AccountSerializer(account, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(
+                serializer.data, safe=False,
+                json_dumps_params={'indent': 2}
+                )
+    # Deletes
+    if request.method == 'DELETE':
+        account.delete()
+        return HttpResponse(staus=204)
 
 
 def getAccountsStructure(request):
