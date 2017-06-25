@@ -32,7 +32,8 @@ def getAccountsStructure(request):
         accounts = Account.objects.all()
         for account in accounts:
             accountData = {
-                "AccountID": account.id, "AccountName": account.name}
+                "AccountID": account.id, "AccountName": account.name,
+                "Category": account.category.name}
             subaccounts = SubAccount.objects.filter(account=account)
             for subaccount in subaccounts:
                 subaccountData = {
