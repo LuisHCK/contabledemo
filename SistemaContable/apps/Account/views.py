@@ -1,7 +1,7 @@
 from rest_framework.parsers import JSONParser
 from rest_framework import viewsets
-from .models import Account, SubAccount, SubSubAccount
-from .serializers import AccountSerializer, SubAccountSerializer
+from .models import Account, SubAccount, SubSubAccount, AccountCategory
+from .serializers import AccountSerializer, SubAccountSerializer, CategorySerializer
 from django.http import JsonResponse, HttpResponse
 from rest_framework.response import Response
 from rest_framework import status
@@ -16,11 +16,29 @@ from django.views.decorators.csrf import csrf_exempt
 def newAccount(request):
     # This view creates a new Account.
     if request.method == 'POST':
-        serializer = AccountSerializer(data=request.data)
+        data = JSONParser().parse(request)
+        serializer = AccountSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            #get category from request
+            try:
+                # if user pick a category get the id and get the category instance
+                # and pass to serializer and save
+                category = AccountCategory.objects.get(pk=int(data['category_id']))
+                serializer.save(category=category)
+            except:
+                # else save account without a category
+                serializer.save()
+                return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def listCategories(request):
+    "List all categories for accounts"
+    categories = AccountCategory.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return JsonResponse(
+        serializer.data, safe=False,
+    )
 
 
 @csrf_exempt
@@ -93,7 +111,7 @@ def rudSubAccount(request, pk):
         subaccount = SubAccount.objects.get(pk=pk)
     except SubAccount.DoesNotExist:
         return HttpResponse(status=404)
-    
+
     # Reads
     if request.method == 'GET':
         serializer = SubAccountSerializer(subaccount, many=False)
@@ -103,7 +121,7 @@ def rudSubAccount(request, pk):
     # Updates
     if request.method == 'PUT':
         data = JSONParser().parse(request)
-        serializer = AccountSerializer(account, data=data)
+        serializer = AccountSerializer(Account, data=data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(
@@ -129,7 +147,9 @@ def getAccountsStructure(request):
         for account in accounts:
             accountData = {
                 "AccountID": account.id, "AccountName": account.name,
-                "Category": account.category.name}
+                # don't get category to avoid NoneType exception
+                #"Category": account.category.name
+                }
             subaccounts = SubAccount.objects.filter(account=account)
             for subaccount in subaccounts:
                 subaccountData = {
