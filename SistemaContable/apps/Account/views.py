@@ -28,7 +28,7 @@ def newAccount(request):
             except:
                 # else save account without a category
                 serializer.save()
-                return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
 
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
