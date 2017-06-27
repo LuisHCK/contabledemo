@@ -12,10 +12,11 @@
     <link href="{% static 'css/materialicons.css' %}" type="text/css" rel="stylesheet">
     <link href="{% static 'css/styles.css' %}" type="text/css" rel="stylesheet">
 
-    <script src="{% static 'js/vue.js' %}"></script>
     <script src="{% static 'js/axios.js' %}"></script>
     <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
     <script src="{% static 'js/materialize.min.js' %}"></script>
+    <script src="{% static 'js/vue.js' %}"></script>
+    
 </head>
 
 <body>
@@ -58,57 +59,75 @@
     <main>
         <div class="container">
             <div id="app">
-                <ul class="collection" v-for="account in accounts">
-                    <li class="collection-item">
-                        <% account.AccountID %>
+                <ul class="collapsible" data-collapsible="accordion" v-for="account in accounts">
+                    <li>
+                        <div class="collapsible-header">
+                            <% account.AccountID %>
                             <% account.AccountName %>
-                    </li>
-                    <ul v-for="subaccount in account.SubAccounts">
-                        <li class="collection-item">
-                            <% account.AccountID %>.
-                            <% subaccount.SubAccountID %>
-                            <% subaccount.SubAccountName %>
-                            <ul v-for="sub_subaccount in subaccount.SubSubAccounts">
+                        </div>
+                        <div class="collapsible-body">
+                            <ul v-for="subaccount in account.SubAccounts">
                                 <li class="collection-item">
                                     <% account.AccountID %>.
-                                    <% subaccount.SubAccountID %>.
-                                    <% sub_subaccount.SubSubAccountID %>
-                                    <% sub_subaccount.SubSubAccountName %>
+                                    <% subaccount.SubAccountID %>
+                                    <% subaccount.SubAccountName %>
+                                    <ul v-for="sub_subaccount in subaccount.SubSubAccounts">
+                                        <li class="collection-item">
+                                            <% account.AccountID %>.
+                                            <% subaccount.SubAccountID %>.
+                                            <% sub_subaccount.SubSubAccountID %>
+                                            <% sub_subaccount.SubSubAccountName %>
+                                        </li>
+                                    </ul>
                                 </li>
-                            </ul>
-                        </li>
-                    </ul>
+                            </ul>                   
+                        </div>
+                    </li>
                 </ul>
-            </div>
-
             <!-- Modal Structure -->
             <div id="modal1" class="modal">
                 <div class="modal-content">
                     <div class="input-field">
                         <h4>Agregar Cuenta</h4>
                         <p>
-                            <input type="text" name="accountname" value="" id="id_accountname" placeholder="Nombre de la cuenta">
-                            <label for="id_accountname"></label>
+                            <form id="form_account" v-on:submit.prevent="addAccount" action="{% url 'account:newAccount' %}">
+                                <div class="input-field">
+                                    <input v-model="newAccount.AccountName" type="text" class="validate">
+                                    <label class="active" for="account_name">Nombre</label>
+                                </div>
+                                <div class="input-field">
+                                    <select id="account_category">
+                                        <option value="">----</option>
+                                        <option v-for="category in categories" v-bind:value="category.id"><% category.name %></option>
+                                    </select>
+                                    <label>Categoría</label>
+                                </div>
+                                <button class="waves-effect waves-light btn">Guardar</button>
+                            </form>
                         </p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Guardar</a>
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancelar</a>
                 </div>
             </div>
+
+            </div>
+
+
 
         </div>
     </main>
     <script src="{% static 'js/main/main.js' %}"></script>
+    <script src="{% static 'js/ajax/home.js' %}"></script>
 </body>
 
 <script>
+$(document).ready(function(){
+    Materialize.updateTextFields();
     $(".button-collapse").sideNav();
-    // Initialize collapse button
-    $(".button-collapse").sideNav();
-    // Initialize collapsible (uncomment the line below if you use the dropdown variation)
-    //$('.collapsible').collapsible();
     $('.modal').modal();
+});
 </script>
 
 </html>
